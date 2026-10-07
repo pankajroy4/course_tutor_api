@@ -1,0 +1,38 @@
+#PostgreSQL. Versions 9.5 and up are supported.  
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: course_tutor_api_development
+  username: pankajkumar 
+  password: Pankaj@123 
+  host: localhost
+
+test:
+  <<: *default
+  database: course_tutor_api_test
+  username: pankajkumar 
+  password: Pankaj@123 
+  host: localhost 
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: course_tutor_api_production
+    username: course_tutor_api
+    password: <%= ENV["COURSE_TUTOR_API_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: course_tutor_api_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: course_tutor_api_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: course_tutor_api_production_cable
+    migrations_paths: db/cable_migrate
