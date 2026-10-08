@@ -11,11 +11,11 @@ class Api::BaseController < ApplicationController
   private
 
   def render_bad_request(exception)
-    render json: { error: exception.message }, status: :bad_request 
+    render json: { errors: [ exception.message ] }, status: :bad_request
   end
 
   def render_invalid_page(_exception)
-    render json: { error: "Invalid page parameter." }, status: :bad_request
+    render json: { errors: [ "Invalid page parameter." ] }, status: :bad_request
   end
 
   def render_record_not_unique(exception)
@@ -29,11 +29,11 @@ class Api::BaseController < ApplicationController
               "resource"
             end
 
-    render json: { error: "Record must be unique: #{field}." }, status: :conflict
+    render json: { errors: [ "Record must be unique: #{field}." ] }, status: :conflict
   end
 
   def render_internal_server_error(e)
     Rails.logger.error("[#{e.class}] #{e.message}\n #{e.backtrace&.first(10)&.join("\n")}")
-    render json: { error: "Something went wrong." }, status: :internal_server_error
+    render json: { errors: [ "Something went wrong." ] }, status: :internal_server_error
   end
 end
