@@ -13,4 +13,6 @@ Rails.application.routes.draw do
       resources :courses, only: %i[index create]
     end 
   end
+
+  match "*unmatched_route", to: "api/not_found#route_not_found", via: :all
 end

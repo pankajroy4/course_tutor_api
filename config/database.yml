@@ -7,16 +7,16 @@ default: &default
 development:
   <<: *default
   database: course_tutor_api_development
-  username: pankajkumar 
-  password: Pankaj@123 
-  host: localhost
+  username: <%= ENV.fetch("DB_USERNAME", "pankajkumar") %> 
+  password: <%= ENV["DB_PASSWORD"] %>
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
 
 test:
   <<: *default
   database: course_tutor_api_test
-  username: pankajkumar 
-  password: Pankaj@123 
-  host: localhost 
+  username: <%= ENV.fetch("DB_USERNAME", "pankajkumar") %>
+  password: <%= ENV["DB_PASSWORD"] %>
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
 
 production:
   primary: &primary_production
