@@ -23,7 +23,7 @@ class Api::V1::CoursesController < Api::BaseController
     value = params[:per_page].to_i
     value.positive? ? value.clamp(1, 100) : Pagy::DEFAULT[:limit]
   end
-  
+
   def course_params
     params.require(:course).permit(
       :name,

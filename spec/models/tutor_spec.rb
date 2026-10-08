@@ -20,9 +20,8 @@ RSpec.describe Tutor, type: :model do
     it "is invalid without a course" do
       tutor = build(:tutor, course: nil)
 
-      expect(tutor).not_to be_valid 
+      expect(tutor).not_to be_valid
       expect(tutor.errors[:course]).to include("must exist")
     end
   end
 end
-

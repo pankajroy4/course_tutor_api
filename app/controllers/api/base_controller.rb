@@ -23,11 +23,11 @@ class Api::BaseController < ApplicationController
 
     field = if index_name.include?("index_courses_on_lower_name")
               "Course's name"
-            elsif index_name.include?("index_tutors_on_lower_email")
+    elsif index_name.include?("index_tutors_on_lower_email")
               "Tutor's email"
-            else
+    else
               "resource"
-            end
+    end
 
     render json: { errors: [ "Record must be unique: #{field}." ] }, status: :conflict
   end

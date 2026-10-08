@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Unmatched routes", type: :request do
   it "returns a JSON 404 for unmatched route" do
-    get "/api/v1/unmatched" 
+    get "/api/v1/unmatched"
 
     expect(response).to have_http_status(:not_found)
     expect(response.parsed_body["errors"].first).to include("No route matches")
@@ -21,6 +21,3 @@ RSpec.describe "Unmatched routes", type: :request do
     expect(response.parsed_body["errors"].first).to include("No route matches")
   end
 end
-
-
-

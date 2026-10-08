@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Api::BaseController" do
   describe "ActionDispatch::Http::Parameters::ParseError" do
     it "returns 400 for invlaid parameter" do
-      post "/api/v1/courses", params: "abcd" 
+      post "/api/v1/courses", params: "abcd"
 
       expect(response).to have_http_status(:bad_request)
       expect(response.parsed_body["errors"]).to be_present
@@ -32,7 +32,7 @@ RSpec.describe "Api::BaseController" do
 
   describe "StandardError" do
     it "returns generic 500 for unexpected error" do
-      get "/api/v1/courses", params: { page: ["1", "2"] }
+      get "/api/v1/courses", params: { page: [ "1", "2" ] }
 
       expect(response).to have_http_status(:internal_server_error)
       expect(response.parsed_body["errors"]).to eq([ "Something went wrong." ])

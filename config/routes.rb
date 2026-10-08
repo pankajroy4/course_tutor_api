@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :courses, only: %i[index create]
-    end 
+    end
   end
 
   match "*unmatched_route", to: "api/not_found#route_not_found", via: :all

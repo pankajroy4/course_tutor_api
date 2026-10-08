@@ -19,9 +19,9 @@ courses = [
   { name: "UPSC Prelims General Studies", description: "Comprehensive coverage of GS Paper I for UPSC Prelims." },
   { name: "IIT JEE Mathematics Advanced", description: "Calculus, algebra, and coordinate geometry for JEE Advanced." }
 
-]  
+]
 
-tutors_by_course = { 
+tutors_by_course = {
   "Ruby on Rails Development" => { name: "Pankaj Kumar", email: "pankaj@example.com" },
   "DevOps Engineering" => { name: "Priya Gupta", email: "priya@example.com" },
   "Machine Learning Fundamentals" => { name: "Sneha Singh", email: "sneha@example.com" },
@@ -43,4 +43,3 @@ courses.each do |course_attrs|
 end
 
 puts "Seeded successful"
-

@@ -1,4 +1,2 @@
-require "pagy/backend" 
+require "pagy/backend"
 Pagy::DEFAULT[:limit] = 20
-
-

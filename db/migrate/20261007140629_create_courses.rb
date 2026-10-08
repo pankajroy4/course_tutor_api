@@ -7,7 +7,6 @@ class CreateCourses < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :courses, "LOWER(name)", unique: true, name: "index_courses_on_lower_name" # case-insensitive uniqueness 
-    
+    add_index :courses, "LOWER(name)", unique: true, name: "index_courses_on_lower_name" # case-insensitive uniqueness
   end
 end

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Course, type: :model do
   describe "associations" do
-    it { is_expected.to have_many(:tutors).dependent(:destroy) } 
+    it { is_expected.to have_many(:tutors).dependent(:destroy) }
     it { is_expected.to accept_nested_attributes_for(:tutors).limit(50).allow_destroy(false) }
   end
 
@@ -15,7 +15,7 @@ RSpec.describe Course, type: :model do
     it { is_expected.to validate_length_of(:description).is_at_most(5_000) }
 
     it "is valid without description" do
-      course = build(:course, :without_description) 
+      course = build(:course, :without_description)
       expect(course).to be_valid
     end
 
@@ -33,7 +33,7 @@ RSpec.describe Course, type: :model do
 
   describe "nested attributes" do
     it "accepts tutor attributes" do
-      course = Course.new( name: "Number Theory", tutors_attributes: [ { name: "Rohit", email: "rohit@gmail.com" } ])
+      course = Course.new(name: "Number Theory", tutors_attributes: [ { name: "Rohit", email: "rohit@gmail.com" } ])
 
       expect(course.tutors.size).to eq(1)
       expect(course.tutors.first.name).to eq("Rohit")
@@ -67,7 +67,7 @@ RSpec.describe Course, type: :model do
 
       course2 = Course.new(
         name: "Hotwire full course",
-        tutors_attributes: [ 
+        tutors_attributes: [
           { name: "Rakesh", email: "duplicate2@gmail.com" },
           { name: "Lalit", email: "DUPLICATE2@GMAIL.COM" }
         ]
@@ -95,11 +95,10 @@ RSpec.describe Course, type: :model do
 
   describe "#destroy" do
     it "destroy course along with its tutors" do
-      course = create(:course) 
+      course = create(:course)
       create_list(:tutor, 3, course: course)
 
       expect { course.destroy }.to change(Tutor, :count).by(-3)
     end
   end
 end
-
