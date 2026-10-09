@@ -97,6 +97,22 @@ RSpec.describe "Api::V1::Courses", type: :request do
       end
     end
 
+    context "when a database-level unique constraint is violated unexpectedly" do
+      it "returns a 409 identifying the violated field for a tutor email collision" do
+        allow_any_instance_of(Course).to receive(:save) do
+          raise PG::UniqueViolation, 'duplicate key value violates unique constraint "index_tutors_on_lower_email"'
+        rescue PG::UniqueViolation
+          raise ActiveRecord::RecordNotUnique,
+                'duplicate key value violates unique constraint "index_tutors_on_lower_email"'
+        end
+
+        post "/api/v1/courses", params: valid_params
+
+        expect(response).to have_http_status(:conflict)
+        expect(response.parsed_body["errors"]).to eq([ "Record must be unique: Tutor's email." ])
+      end
+    end
+
     context "when more tutors are submitted than the allowed limit" do
       it "returns a 400" do
         params = {
@@ -144,6 +160,93 @@ RSpec.describe "Api::V1::Courses", type: :request do
 
         expect(response).to have_http_status(:created)
         expect(response.parsed_body["course"]["tutors"].first).not_to have_key("salary")
+      end
+    end
+  end
+
+  describe "GET /api/v1/courses" do
+    it "returns an empty list and meta when there are no courses" do
+      get "/api/v1/courses"
+      body = response.parsed_body
+
+      expect(response).to have_http_status(:ok)
+      expect(body["courses"]).to eq([])
+      expect(body["meta"]).to eq("page" => 1, "pages" => 1, "count" => 0, "limit" => 20)
+    end
+
+    it "returns all course along with its tutors" do
+      course = create(:course, name: "Ruby on Rails")
+      create(:tutor, course: course, name: "Pankaj Kumar")
+      create(:course, name: "React Basics")
+
+      get "/api/v1/courses"
+      courses = response.parsed_body["courses"]
+      expect(response).to have_http_status(:ok)
+      expect(courses.size).to eq(2)
+
+      resp = courses.find { |course| course["name"] == "Ruby on Rails" }
+      expect(resp["id"]).to eq(course.id)
+      expect(resp["tutors"].pluck("name")).to contain_exactly("Pankaj Kumar")
+    end
+
+    it "returns a course with an empty tutors array when there is no tutor" do
+      create(:course, name: "UPSC Mains")
+      get "/api/v1/courses"
+
+      expect(response.parsed_body["courses"].first["tutors"]).to eq([])
+    end
+
+    it "orders courses with the most recently created first" do
+      course1 = create(:course, name: "UPSC mains")
+      course2 = create(:course, name: "UPSC prelims")
+
+      get "/api/v1/courses"
+
+      names = response.parsed_body["courses"].pluck("name")
+      expect(names.index(course2.name)).to be < names.index(course1.name)
+    end
+
+    it "paginates defaulting to 20 courses per page" do
+      create_list(:course, 25)
+      get "/api/v1/courses"
+
+      body = response.parsed_body
+      expect(body["courses"].size).to eq(20)
+      expect(body["meta"]).to eq("page" => 1, "pages" => 2, "count" => 25, "limit" => 20)
+    end
+
+    it "returns the second page when asked" do
+      create_list(:course, 25)
+      get "/api/v1/courses", params: { page: 2 }
+
+      body = response.parsed_body
+      expect(body["courses"].size).to eq(5)
+      expect(body["meta"]["page"]).to eq(2)
+    end
+
+    it "lets the client ask for a smaller page size" do
+      create_list(:course, 10)
+
+      get "/api/v1/courses", params: { per_page: 5 }
+      body = response.parsed_body
+      expect(body["courses"].size).to eq(5)
+      expect(body["meta"]["limit"]).to eq(5)
+    end
+
+    it "clamps an oversized per_page" do
+      create_list(:course, 10)
+
+      get "/api/v1/courses", params: { per_page: 99_999 }
+      expect(response.parsed_body["meta"]["limit"]).to eq(100)
+    end
+
+    it "falls back to the default page size for a zero, negative, or non-numeric per_page" do
+      create_list(:course, 25)
+
+      [ 0, -5, "abc" ].each do |invalid_value|
+        get "/api/v1/courses", params: { per_page: invalid_value }
+
+        expect(response.parsed_body["meta"]["limit"]).to eq(20)
       end
     end
   end
